@@ -82,9 +82,7 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
         );
     };
 
-    const renderSeparator = () => (
-        <View style={{ marginHorizontal: SCALER.w(32), marginVertical: SCALER.h(24), height: 2, backgroundColor: colors.border }} />
-    );
+    const renderSeparator = () => <View style={styles.separator} />;
 
     const renderHeader = () => {
         return (
@@ -171,7 +169,8 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         borderWidth: 1,
         borderColor: colors.blue[400]
-    }
+    },
+    separator: { marginHorizontal: SCALER.w(32), marginVertical: SCALER.h(24), height: 2, backgroundColor: colors.border }
 });
 
 export { TxnList };
