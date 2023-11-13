@@ -7,14 +7,17 @@ import { SCALER } from '../utils/scaler';
 import { colors } from '../styles';
 import { formatCurrency, getTextAmountColor, getTxnTypeDesc } from '../utils';
 import { ROUTES } from '../constants/routes';
+import { BiometricsAPI } from '../integrations/biometric';
+import Toast from 'react-native-toast-message';
 
 interface ListProps {
     data: TxnHistoryItem[];
     onRefresh: () => void;
     refreshing: boolean;
+    isRestricted: boolean;
 }
 
-const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
+const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
     const navigation = useNavigation();
     const [total, setTotal] = useState<{ credit: number; debit: number }>({ credit: 0.0, debit: 0.0 });
 
@@ -34,15 +37,23 @@ const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
         setTotal({ credit: totalCredit, debit: totalDebit });
     };
 
-    const handlePressItem = (item: TxnHistoryItem) => {
-        navigation.navigate(ROUTES.TRANSACTION_HISTORY_DETAILS, { data: item });
+    const handlePressItem = async (item: TxnHistoryItem) => {
+        if (isRestricted)
+            Toast.show({
+                type: 'info',
+                text1: 'Restricted!',
+                text2: 'Transaction details is only available in unrestricted mode. Unlock this feature by tapping on "Unlock unrestricted view" button on the top left of your screen.'
+            });
+        else navigation.navigate(ROUTES.TRANSACTION_HISTORY_DETAILS, { data: item });
     };
 
     const renderItem = ({ item }: { item: TxnHistoryItem }) => {
         return (
             <TouchableOpacity onPress={() => handlePressItem(item)}>
                 <Text style={styles.textDate}>{moment(item.date).format('DD MMMM YYYY')}</Text>
-                <Text style={[styles.textAmount, { color: getTextAmountColor(item.type) }]}>RM {formatCurrency(item.amount)}</Text>
+                <Text style={[styles.textAmount, { color: getTextAmountColor(item.type) }]}>
+                    RM {isRestricted ? '**.**' : formatCurrency(item.amount)}
+                </Text>
                 <View style={styles.row}>
                     <View style={styles.flex1}>
                         <Text style={styles.textLabel}>Transaction Type</Text>
@@ -82,7 +93,9 @@ const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
                         <Text style={styles.textLabelTotal}>Total Credit</Text>
                     </View>
                     <View style={styles.flex1}>
-                        <Text style={[styles.textValueTotal, { color: colors.green[500] }]}>RM {formatCurrency(total.credit)}</Text>
+                        <Text style={[styles.textValueTotal, { color: colors.green[500] }]}>
+                            RM {isRestricted ? '**.**' : formatCurrency(total.credit)}
+                        </Text>
                     </View>
                 </View>
                 <View style={styles.row}>
@@ -90,7 +103,9 @@ const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
                         <Text style={styles.textLabelTotal}>Total Debit</Text>
                     </View>
                     <View style={styles.flex1}>
-                        <Text style={[styles.textValueTotal, { color: colors.red[500] }]}>RM {formatCurrency(total.debit)}</Text>
+                        <Text style={[styles.textValueTotal, { color: colors.red[500] }]}>
+                            RM {isRestricted ? '**.**' : formatCurrency(total.debit)}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -123,7 +138,7 @@ const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
 const styles = StyleSheet.create({
     row: { flexDirection: 'row', marginBottom: SCALER.h(6) },
     flex1: { flex: 1 },
-    headerContainer: { marginTop: SCALER.h(24), marginBottom: SCALER.h(24) },
+    headerContainer: { marginBottom: SCALER.h(24) },
     textHeader: { fontWeight: 'bold', fontSize: 32, marginBottom: SCALER.h(32) },
     textAmount: { fontWeight: 'bold', fontSize: 28, marginBottom: SCALER.h(24) },
     textDate: { fontSize: 14, color: colors.neutral[500], marginBottom: SCALER.h(12) },

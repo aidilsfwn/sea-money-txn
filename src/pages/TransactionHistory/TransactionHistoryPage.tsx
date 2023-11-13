@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Linking } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { SafeAreaSpacer, TxnList } from '../../components';
+import { SafeAreaSpacer, Spacer, TxnList } from '../../components';
 import { colors } from '../../styles';
 import { LoadingOverlay } from '../../components';
+import { SCALER } from '../../utils';
+import { BiometricsAPI } from '../../integrations/biometric';
 
 export interface TxnHistoryItem {
     id: string;
@@ -19,9 +21,17 @@ const TransactionHistoryPage = () => {
     const [txnList, setTxnList] = useState<TxnHistoryItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+    const [isRestricted, setIsRestricted] = useState<boolean>(true);
+    const [isBiometricsAvailable, setIsBiometricsAvailable] = useState<boolean>(true);
 
     useEffect(() => {
         fetchData(false);
+    }, []);
+
+    useEffect(() => {
+        BiometricsAPI.isSensorAvailable().then((supported) => {
+            setIsBiometricsAvailable(supported);
+        });
     }, []);
 
     const fetchData = async (isRefresh: boolean) => {
@@ -43,10 +53,28 @@ const TransactionHistoryPage = () => {
         fetchData(true);
     };
 
+    const handleUnrestrict = async () => {
+        if (!isBiometricsAvailable) Linking.openSettings();
+        else {
+            const applyBiometric = await BiometricsAPI.biometricPrompt();
+            if (applyBiometric) setIsRestricted(false);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <SafeAreaSpacer type={'top'} />
-            <TxnList data={txnList} onRefresh={() => handleRefresh()} refreshing={isRefreshing} />
+            {isRestricted && (
+                <TouchableOpacity onPress={handleUnrestrict} style={{ marginHorizontal: SCALER.w(32), marginTop: SCALER.h(16) }}>
+                    <Text style={{ color: colors.blue[500] }}>
+                        {!isBiometricsAvailable
+                            ? `Enable biometrics in device's settings to unlock unrestricted view`
+                            : 'Unlock unrestricted view'}
+                    </Text>
+                </TouchableOpacity>
+            )}
+            <Spacer space={SCALER.h(24)} />
+            <TxnList data={txnList} onRefresh={() => handleRefresh()} refreshing={isRefreshing} isRestricted={isRestricted} />
             <LoadingOverlay isVisible={isLoading} />
         </View>
     );
