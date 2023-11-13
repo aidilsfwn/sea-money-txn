@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { ROUTES } from './constants/routes';
 import * as Pages from './pages';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const Navigation = () => {
     return (

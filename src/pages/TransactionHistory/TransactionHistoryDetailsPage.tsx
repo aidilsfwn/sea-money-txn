@@ -8,21 +8,28 @@ import { TxnHistoryItem } from './TransactionHistoryPage';
 import { SCALER, formatCurrency, getTextAmountColor, getTxnTypeDesc } from '../../utils';
 
 interface TransactionHistoryDetailsProps {
-    route: {
+    route?: {
         params: {
-            item: TxnHistoryItem;
+            data: TxnHistoryItem;
         };
     };
 }
 
+const DEFAULT_DATA: TxnHistoryItem = {
+    amount: '0.00',
+    date: '2023-11-13T19:10:31.525Z',
+    description: '-',
+    id: '0',
+    refNo: '-',
+    type: 'd'
+};
+
 const TransactionHistoryDetailsPage = ({ route }: TransactionHistoryDetailsProps) => {
     const navigation = useNavigation();
 
-    const { refNo, amount, date, type, description } = route.params.item;
+    const { refNo, amount, date, type, description } = route?.params.data ?? DEFAULT_DATA;
 
-    const handleBack = () => {
-        navigation.goBack();
-    };
+    const handleBack = () => navigation.goBack();
 
     return (
         <View style={styles.container}>

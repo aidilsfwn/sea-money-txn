@@ -11,5 +11,7 @@ export enum ROUTES {
 export type ROUTES_PARAMS = {
     Home: undefined;
     TransactionHistory: undefined;
-    TransactionHistoryDetails: { item: TxnHistoryItem };
+    TransactionHistoryDetails: {
+        data: TxnHistoryItem;
+    };
 };

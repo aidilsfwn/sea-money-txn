@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 import { SafeAreaSpacer, TxnList } from '../../components';
 import { colors } from '../../styles';
 import { LoadingOverlay } from '../../components';
-import Toast from 'react-native-toast-message';
 
 export interface TxnHistoryItem {
     id: string;
@@ -29,7 +29,7 @@ const TransactionHistoryPage = () => {
         else setIsLoading(true);
 
         try {
-            const { statusText, data } = await axios.get('https://6551b75d5c69a779032904c5.mockapi.io/api/v1/transactions');
+            const { data } = await axios.get('https://6551b75d5c69a779032904c5.mockapi.io/api/v1/transactions');
             setTxnList(data);
         } catch (e) {
             Toast.show({ type: 'error', text1: e.code, text2: e.message });

@@ -35,7 +35,7 @@ const TxnList = ({ data, onRefresh, refreshing }: ListProps) => {
     };
 
     const handlePressItem = (item: TxnHistoryItem) => {
-        navigation.navigate(ROUTES.TRANSACTION_HISTORY_DETAILS, { item: item });
+        navigation.navigate(ROUTES.TRANSACTION_HISTORY_DETAILS, { data: item });
     };
 
     const renderItem = ({ item }: { item: TxnHistoryItem }) => {
