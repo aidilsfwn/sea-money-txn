@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Linking } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { SafeAreaSpacer, Spacer, TxnList } from '../../components';
+import { SafeAreaSpacer, Spacer, Text, TxnList } from '../../components';
 import { colors } from '../../styles';
 import { LoadingOverlay } from '../../components';
 import { SCALER } from '../../utils';
@@ -65,8 +65,8 @@ const TransactionHistoryPage = () => {
         <View style={styles.container}>
             <SafeAreaSpacer type={'top'} />
             {isRestricted && (
-                <TouchableOpacity onPress={handleUnrestrict} style={{ marginHorizontal: SCALER.w(32), marginTop: SCALER.h(16) }}>
-                    <Text style={{ color: colors.blue[500] }}>
+                <TouchableOpacity onPress={handleUnrestrict} style={styles.unlockButtonContainer}>
+                    <Text bold style={{ color: colors.neutral[200] }}>
                         {!isBiometricsAvailable
                             ? `Enable biometrics in device's settings to unlock unrestricted view`
                             : 'Unlock unrestricted view'}
@@ -81,7 +81,15 @@ const TransactionHistoryPage = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.neutral[100] }
+    container: { flex: 1, backgroundColor: colors.blue[300] },
+    unlockButtonContainer: {
+        backgroundColor: colors.red[400],
+        marginHorizontal: SCALER.w(32),
+        marginTop: SCALER.h(16),
+        paddingVertical: SCALER.h(8),
+        alignItems: 'center',
+        borderRadius: 10
+    }
 });
 
 export { TransactionHistoryPage };

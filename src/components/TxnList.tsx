@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import moment from 'moment';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
+import Toast from 'react-native-toast-message';
 import { TxnHistoryItem } from '../pages';
 import { SCALER } from '../utils/scaler';
 import { colors } from '../styles';
 import { formatCurrency, getTextAmountColor, getTxnTypeDesc } from '../utils';
 import { ROUTES } from '../constants/routes';
-import { BiometricsAPI } from '../integrations/biometric';
-import Toast from 'react-native-toast-message';
+import { Text } from '.';
 
 interface ListProps {
     data: TxnHistoryItem[];
@@ -42,15 +42,15 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
             Toast.show({
                 type: 'info',
                 text1: 'Restricted!',
-                text2: 'Transaction details is only available in unrestricted mode. Unlock this feature by tapping on "Unlock unrestricted view" button on the top left of your screen.'
+                text2: 'Transaction details is only available in unrestricted mode.'
             });
         else navigation.navigate(ROUTES.TRANSACTION_HISTORY_DETAILS, { data: item });
     };
 
     const renderItem = ({ item }: { item: TxnHistoryItem }) => {
         return (
-            <TouchableOpacity onPress={() => handlePressItem(item)}>
-                <Text style={styles.textDate}>{moment(item.date).format('DD MMMM YYYY')}</Text>
+            <TouchableOpacity onPress={() => handlePressItem(item)} style={{ marginHorizontal: SCALER.w(32) }}>
+                <Text style={styles.textDate}>{moment(item.date).format('D MMMM YYYY')}</Text>
                 <Text style={[styles.textAmount, { color: getTextAmountColor(item.type) }]}>
                     RM {isRestricted ? '**.**' : formatCurrency(item.amount)}
                 </Text>
@@ -87,25 +87,31 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
     const renderHeader = () => {
         return (
             <View style={styles.headerContainer}>
-                <Text style={styles.textHeader}>Transaction History</Text>
-                <View style={styles.row}>
-                    <View style={styles.flex1}>
-                        <Text style={styles.textLabelTotal}>Total Credit</Text>
-                    </View>
-                    <View style={styles.flex1}>
-                        <Text style={[styles.textValueTotal, { color: colors.green[500] }]}>
-                            RM {isRestricted ? '**.**' : formatCurrency(total.credit)}
-                        </Text>
-                    </View>
+                <View style={{ backgroundColor: colors.blue[300], paddingHorizontal: SCALER.w(32) }}>
+                    <Text style={styles.textHeader} bold>
+                        Transaction History
+                    </Text>
                 </View>
-                <View style={styles.row}>
-                    <View style={styles.flex1}>
-                        <Text style={styles.textLabelTotal}>Total Debit</Text>
+                <View style={styles.totalCard}>
+                    <View style={[styles.row, { marginBottom: SCALER.h(16) }]}>
+                        <View style={styles.flex1}>
+                            <Text style={styles.textLabelTotal}>Total Credit</Text>
+                        </View>
+                        <View style={styles.flex1}>
+                            <Text style={[styles.textValueTotal, { color: colors.green[500] }]}>
+                                RM {isRestricted ? '**.**' : formatCurrency(total.credit)}
+                            </Text>
+                        </View>
                     </View>
-                    <View style={styles.flex1}>
-                        <Text style={[styles.textValueTotal, { color: colors.red[500] }]}>
-                            RM {isRestricted ? '**.**' : formatCurrency(total.debit)}
-                        </Text>
+                    <View style={[styles.row, { marginBottom: SCALER.h(0) }]}>
+                        <View style={styles.flex1}>
+                            <Text style={styles.textLabelTotal}>Total Debit</Text>
+                        </View>
+                        <View style={styles.flex1}>
+                            <Text style={[styles.textValueTotal, { color: colors.red[500] }]}>
+                                RM {isRestricted ? '**.**' : formatCurrency(total.debit)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -114,7 +120,7 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
 
     const renderEmpty = () => {
         return (
-            <View style={styles.flex1}>
+            <View style={[styles.flex1, { marginHorizontal: SCALER.w(32) }]}>
                 <Text style={{ color: colors.neutral[500] }}>There's no transaction available at the moment</Text>
             </View>
         );
@@ -122,7 +128,7 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
 
     return (
         <FlatList
-            contentContainerStyle={{ flexGrow: 1, paddingHorizontal: SCALER.w(32), paddingBottom: SCALER.h(64) }}
+            contentContainerStyle={styles.container}
             data={data}
             renderItem={renderItem}
             keyExtractor={(item) => item.refNo}
@@ -136,16 +142,34 @@ const TxnList = ({ data, onRefresh, refreshing, isRestricted }: ListProps) => {
 };
 
 const styles = StyleSheet.create({
+    container: { flexGrow: 1, paddingHorizontal: SCALER.w(0), paddingBottom: SCALER.h(64), backgroundColor: colors.neutral[100] },
     row: { flexDirection: 'row', marginBottom: SCALER.h(6) },
     flex1: { flex: 1 },
     headerContainer: { marginBottom: SCALER.h(24) },
-    textHeader: { fontWeight: 'bold', fontSize: 32, marginBottom: SCALER.h(32) },
-    textAmount: { fontWeight: 'bold', fontSize: 28, marginBottom: SCALER.h(24) },
+    textHeader: { fontSize: 32, marginBottom: SCALER.h(24), marginRight: SCALER.w(16), color: colors.neutral[100] },
+    textAmount: { fontSize: 24, marginBottom: SCALER.h(24) },
     textDate: { fontSize: 14, color: colors.neutral[500], marginBottom: SCALER.h(12) },
     textLabelTotal: { fontSize: 18, color: colors.neutral[600] },
-    textValueTotal: { fontSize: 18, textAlign: 'right', fontWeight: 'bold', color: colors.neutral[700] },
+    textValueTotal: { fontSize: 18, textAlign: 'right', color: colors.neutral[700] },
     textLabel: { fontSize: 16, color: colors.neutral[600] },
-    textValue: { fontSize: 16, color: colors.neutral[700], fontWeight: 'bold', textAlign: 'right' }
+    textValue: { fontSize: 16, color: colors.neutral[700], textAlign: 'right' },
+    shadow: {
+        shadowOffset: { width: 0, height: 12 },
+        shadowColor: colors.shadow,
+        shadowOpacity: 0.12, // ios shadow
+        shadowRadius: 32
+    },
+    totalCard: {
+        backgroundColor: colors.neutral[100],
+        marginHorizontal: SCALER.w(32),
+        paddingVertical: SCALER.h(24),
+        paddingHorizontal: SCALER.w(18),
+        marginTop: SCALER.h(36),
+        marginBottom: SCALER.h(18),
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: colors.blue[400]
+    }
 });
 
 export { TxnList };

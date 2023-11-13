@@ -35,5 +35,6 @@ export const colors = {
         200: '#EEEEEE',
         100: '#FFFFFF'
     },
-    border: 'rgba(197, 197, 197, 0.25)'
+    border: 'rgba(197, 197, 197, 0.25)',
+    shadow: '#3E3E3E'
 };
