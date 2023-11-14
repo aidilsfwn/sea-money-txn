@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Linking, StatusBar } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { SafeAreaSpacer, Spacer, Text, TxnList } from '../../components';
@@ -63,6 +63,7 @@ const TransactionHistoryPage = () => {
 
     return (
         <View style={styles.container}>
+            <StatusBar barStyle={'light-content'} />
             <SafeAreaSpacer type={'top'} />
             {isRestricted && (
                 <TouchableOpacity onPress={handleUnrestrict} style={styles.unlockButtonContainer}>
